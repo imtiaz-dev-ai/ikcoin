@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Admin — IK Coin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="admin-style.css"/>
+</head>
+<body>
+
+<!-- ADMIN LOGIN SCREEN -->
+<div id="adminLoginScreen" style="position:fixed;inset:0;background:#0a0a0f;display:flex;align-items:center;justify-content:center;z-index:9999">
+  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(245,197,24,.3);border-radius:20px;padding:36px 28px;width:90%;max-width:340px;text-align:center">
+    <div style="width:56px;height:56px;background:linear-gradient(135deg,#f5c518,#e6a800);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem;color:#000;margin:0 auto 12px">IK</div>
+    <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px">Admin Panel</div>
+    <div style="font-size:.75rem;color:#6b7280;margin-bottom:24px">Authorized Access Only</div>
+    <input type="text" id="adminUser" placeholder="Username" autocomplete="off"
+      style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;padding:12px 14px;font-size:.9rem;outline:none;margin-bottom:10px"/>
+    <input type="password" id="adminPass" placeholder="Password"
+      style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;padding:12px 14px;font-size:.9rem;outline:none;margin-bottom:16px"
+      onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <button onclick="adminLogin()"
+      style="width:100%;background:linear-gradient(135deg,#f5c518,#e6a800);color:#000;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:.95rem;cursor:pointer">Login</button>
+    <div id="adminLoginErr" style="color:#ef4444;font-size:.78rem;margin-top:10px;min-height:18px"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="adm-header">
+  <div class="adm-logo">
+    <div class="adm-logo-badge">IK</div>
+    <div>
+      <div><span>IK</span><strong>COIN</strong></div>
+      <div class="adm-logo-sub">ADMIN PANEL</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div> Live</div>
+    <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> App</a>
+  </div>
+</header>
+
+<!-- SECTIONS (injected by admin-sections.js) -->
+<div class="adm-content" id="adm-content"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="adm-nav">
+  <div class="adm-nav-row">
+    <button class="anav-btn active" id="anav-dashboard" onclick="showSection('dashboard')">
+      <i class="fa-solid fa-gauge"></i><span>Home</span>
+    </button>
+    <button class="anav-btn" id="anav-users" onclick="showSection('users')">
+      <i class="fa-solid fa-users"></i><span>Users</span>
+    </button>
+    <button class="anav-btn" id="anav-deposits" onclick="showSection('deposits')">
+      <div class="anav-icon-wrap">
+        <i class="fa-solid fa-circle-arrow-down"></i>
+        <span class="anav-badge hidden" id="badge-deposits">0</span>
+      </div>
+      <span>Deposits</span>
+    </button>
+    <button class="anav-btn" id="anav-withdrawals" onclick="showSection('withdrawals')">
+      <div class="anav-icon-wrap">
+        <i class="fa-solid fa-circle-arrow-up"></i>
+        <span class="anav-badge hidden" id="badge-withdrawals">0</span>
+      </div>
+      <span>Withdraw</span>
+    </button>
+    <button class="anav-btn" id="anav-support" onclick="showSection('support')">
+      <div class="anav-icon-wrap">
+        <i class="fa-solid fa-headset"></i>
+        <span class="anav-badge hidden" id="badge-support">0</span>
+      </div>
+      <span>Support</span>
+    </button>
+    <button class="anav-btn" id="anav-transactions" onclick="showSection('transactions')">
+      <i class="fa-solid fa-clock-rotate-left"></i><span>Txns</span>
+    </button>
+    <button class="anav-btn" id="anav-claims" onclick="showSection('claims')">
+      <i class="fa-solid fa-gift"></i><span>Claims</span>
+    </button>
+    <button class="anav-btn" id="anav-settings" onclick="showSection('settings')">
+      <i class="fa-solid fa-sliders"></i><span>Settings</span>
+    </button>
+    <button class="anav-btn" id="anav-logs" onclick="showSection('logs')">
+      <i class="fa-solid fa-scroll"></i><span>Logs</span>
+    </button>
+  </div>
+</nav>
+
+<div id="admToast" class="adm-toast hidden"></div>
+
+<script src="db.js"></script>
+<script src="admin-sections.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

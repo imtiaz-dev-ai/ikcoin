@@ -1,0 +1,14 @@
+# Secrets
+backend/.env
+api/config.php
+
+# Useless files
+*.jpeg
+*.jpg
+*.png
+firebase-config.js
+EMAILJS_SETUP.txt
+
+# System
+.DS_Store
+Thumbs.db
