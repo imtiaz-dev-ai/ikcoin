@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
 </head>
 <body>
 
@@ -17,66 +20,17 @@
     <div class="ik-logo-badge">IK</div>
     <span>IK<strong>COIN</strong></span>
   </div>
-
   <div class="auth-card" id="stepLogin">
-    <h2>Welcome Back</h2>
-    <p class="auth-sub">Enter your email to continue</p>
-    <div class="auth-inp-wrap">
-      <i class="fa-solid fa-envelope"></i>
-      <input type="email" id="loginEmail" placeholder="your@email.com"/>
+    <h2>Welcome to IK Coin</h2>
+    <p class="auth-sub">Sign in to continue</p>
+    <div id="googleBtnWrap" style="display:flex;justify-content:center;margin:18px 0 10px">
+      <button id="googleLoginBtn" onclick="googleLogin()" style="display:flex;align-items:center;gap:10px;background:#fff;color:#333;border:none;border-radius:50px;padding:12px 28px;font-size:.95rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3)">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"/> Sign in with Google
+      </button>
     </div>
-    <button class="auth-btn" onclick="sendOTP()">
-      <i class="fa-solid fa-paper-plane"></i> Send OTP
-    </button>
-    <p class="auth-switch">New user? <span onclick="showRegister()">Register here</span></p>
     <div id="loginMsg" class="auth-msg"></div>
-  </div>
-
-  <div class="auth-card hidden" id="stepRegister">
-    <h2>Create Account</h2>
-    <p class="auth-sub">Join IK Coin Wallet</p>
-    <div class="auth-inp-wrap">
-      <i class="fa-solid fa-user"></i>
-      <input type="text" id="regName" placeholder="Full Name"/>
-    </div>
-    <div class="auth-inp-wrap">
-      <i class="fa-solid fa-envelope"></i>
-      <input type="email" id="regEmail" placeholder="your@email.com"/>
-    </div>
-    <div class="auth-inp-wrap">
-      <i class="fa-solid fa-phone"></i>
-      <input type="tel" id="regPhone" placeholder="03XX-XXXXXXX"/>
-    </div>
-    <div class="auth-inp-wrap">
-      <i class="fa-solid fa-gift" style="color:#f5c518"></i>
-      <input type="text" id="regRefCode" placeholder="Referral Code (optional) 🎁" style="text-transform:uppercase" oninput="checkRefCode(this.value)"/>
-    </div>
-    <div id="refHintBox" class="ref-hint-box"></div>
-    <button class="auth-btn" onclick="registerUser()">
-      <i class="fa-solid fa-user-plus"></i> Register & Send OTP
-    </button>
-    <p class="auth-switch">Already have account? <span onclick="showLogin()">Login</span></p>
-    <div id="regMsg" class="auth-msg"></div>
-  </div>
-
-  <div class="auth-card hidden" id="stepOTP">
-    <div class="otp-icon"><i class="fa-solid fa-shield-halved"></i></div>
-    <h2>Verify OTP</h2>
-    <p class="auth-sub" id="otpSubText">OTP sent to your email</p>
-    <div class="otp-boxes">
-      <input class="otp-box" type="number" maxlength="1" id="o1" oninput="otpNext(this,'o2')"/>
-      <input class="otp-box" type="number" maxlength="1" id="o2" oninput="otpNext(this,'o3')"/>
-      <input class="otp-box" type="number" maxlength="1" id="o3" oninput="otpNext(this,'o4')"/>
-      <input class="otp-box" type="number" maxlength="1" id="o4" oninput="otpNext(this,'o5')"/>
-      <input class="otp-box" type="number" maxlength="1" id="o5" oninput="otpNext(this,'o6')"/>
-      <input class="otp-box" type="number" maxlength="1" id="o6" oninput="otpNext(this,null)"/>
-    </div>
-    <div class="otp-timer">Resend in <span id="otpTimer">60</span>s</div>
-    <button class="auth-btn" onclick="verifyOTP()">
-      <i class="fa-solid fa-check-circle"></i> Verify & Login
-    </button>
-    <button class="auth-btn-ghost" onclick="showLogin()">← Back</button>
-    <div id="otpMsg" class="auth-msg"></div>
+    <div id="refHintBox" class="ref-hint-box" style="display:none"></div>
+    <input type="text" id="regRefCode" placeholder="Referral Code (optional)" style="display:none"/>
   </div>
 </div>
 
@@ -140,7 +94,7 @@
   </div>
   <div class="wallet-actions">
     <button class="wa-btn" onclick="openDeposit()"><i class="fa-solid fa-circle-plus"></i><span>Deposit</span></button>
-    <button class="wa-btn sell" onclick="showPage('trade')"><i class="fa-solid fa-circle-minus"></i><span>Sell</span></button>
+    <button class="wa-btn sell" onclick="showToast('⏳ Withdraw Coming Soon!')"><i class="fa-solid fa-circle-minus"></i><span>Withdraw</span></button>
     <button class="wa-btn send" onclick="openShare()"><i class="fa-solid fa-paper-plane"></i><span>Share</span></button>
     <button class="wa-btn recv" onclick="openReceive()"><i class="fa-solid fa-qrcode"></i><span>Receive</span></button>
   </div>
@@ -166,13 +120,19 @@
       </div>
     </div>
   </div>
-  <div class="trade-tabs">
+  <div class="trade-tabs" style="display:none">
     <button class="tt active" id="ttBuy" onclick="switchTrade('buy')"><i class="fa-solid fa-circle-plus"></i> Buy</button>
     <button class="tt" id="ttSell" onclick="switchTrade('sell')"><i class="fa-solid fa-circle-minus"></i> Sell</button>
   </div>
 
+  <!-- COMING SOON OVERLAY -->
+  <div style="text-align:center;padding:48px 20px">
+    <div style="font-size:3rem;margin-bottom:12px">🚀</div>
+    <div style="font-size:1.3rem;font-weight:700;color:#f5c518;margin-bottom:8px">Coming Soon</div>
+    <div style="font-size:.85rem;color:#9ca3af">Trading feature jald aa rahi hai.<br/>Stay tuned!</div>
+  </div>
   <!-- BUY via Binance -->
-  <div id="tpBuy" class="trade-panel">
+  <div id="tpBuy" class="trade-panel" style="display:none">
     <div class="binance-box">
       <div class="binance-logo">
         <i class="fa-brands fa-bitcoin" style="color:#f0b90b;font-size:1.5rem"></i>
@@ -214,7 +174,7 @@
   </div>
 
   <!-- SELL via Binance -->
-  <div id="tpSell" class="trade-panel hidden">
+  <div id="tpSell" class="trade-panel hidden" style="display:none !important">
     <div class="binance-box">
       <div class="binance-logo">
         <i class="fa-brands fa-bitcoin" style="color:#f0b90b;font-size:1.5rem"></i>
@@ -242,6 +202,7 @@
   </div>
   <div id="tradeMsg" class="trade-msg hidden"></div>
 </div>
+<!-- WITHDRAW COMING SOON in Wallet -->
 
 <!-- TEAM + REFERRAL -->
 <div class="page" id="page-team">

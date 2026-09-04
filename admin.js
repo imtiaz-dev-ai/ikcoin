@@ -56,17 +56,16 @@ function showSection(name) {
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
     checkAdminAuth();
-    injectSections();
-    await loadSettings();
-    await loadStats();
-    await loadDashTx();
-    await loadClaims();
+    injectSections(); // pehle sections inject karo
+    // phir data load karo
+    await Promise.all([loadSettings(), loadStats(), loadDashTx(), loadClaims()]);
 });
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 async function loadSettings() {
     try {
         const s = await DB.adminGetSettings();
+        console.log('Settings from DB:', s);
         const map = {
             aPrice:'price', aSupply:'supply', aHolders:'holders', aNetwork:'network',
             aFee:'fee', aRefPct:'refSellPct', aBinanceId:'binanceId',
@@ -74,18 +73,19 @@ async function loadSettings() {
             r1t:'r1title', r1d:'r1desc', r2t:'r2title', r2d:'r2desc',
             r3t:'r3title', r3d:'r3desc', r4t:'r4title', r4d:'r4desc'
         };
-        Object.entries(map).forEach(([id,key])=>{ const e=el(id); if(e&&s[key]) e.value=s[key]; });
+        Object.entries(map).forEach(([id,key])=>{ const e=el(id); if(e && s[key] !== undefined) e.value=s[key]; });
         if(s.price) {
             if(el('quickPrice')) el('quickPrice').value=s.price;
             if(el('currentPriceDisplay')) el('currentPriceDisplay').textContent='$'+parseFloat(s.price).toFixed(6);
         }
-    } catch(e) {}
+    } catch(e) { console.error('loadSettings error:', e.message); }
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────
 async function loadStats() {
     try {
         const s = await DB.adminGetStats();
+        console.log('Stats from DB:', s);
         if(el('asTotalBuy'))      el('asTotalBuy').textContent      = fmtB(s.buy_volume);
         if(el('asTotalSell'))     el('asTotalSell').textContent     = fmtB(s.sell_volume);
         if(el('asTxCount'))       el('asTxCount').textContent       = s.tx_count;
@@ -99,7 +99,7 @@ async function loadStats() {
         setBadge('badge-deposits',   pd);
         setBadge('badge-withdrawals', pw);
         setBadge('badge-support',    ot);
-    } catch(e) {}
+    } catch(e) { console.error('loadStats error:', e.message); }
 }
 function setBadge(id, n) {
     const b = el(id); if(!b) return;
@@ -162,6 +162,7 @@ async function clearTx() {
 async function loadUsers() {
     try {
         const data=await DB.adminGetUsers();
+        console.log('Users from DB:', data);
         const arr=data.users||[], stats=data.stats||{};
         if(el('totalUsersCount'))  el('totalUsersCount').textContent  = stats.total||arr.length;
         if(el('activeUsersCount')) el('activeUsersCount').textContent = stats.active||0;
@@ -189,7 +190,7 @@ async function loadUsers() {
                     <button class="ui-btn ban" onclick="setUserStatus('${u.email}','banned')">🚫 Ban</button>
                 </div>
             </div>`).join('');
-    } catch(e) {}
+    } catch(e) { console.error('loadUsers error:', e.message); }
 }
 
 async function setUserStatus(email, status) {
@@ -217,12 +218,13 @@ async function quickSavePrice() {
 async function saveCoin() {
     const settings={};
     [['aPrice','price'],['aSupply','supply'],['aHolders','holders'],['aNetwork','network'],['aFee','fee'],['aRefPct','refSellPct'],['aBinanceId','binanceId']]
-        .forEach(([id,k])=>{ const v=el(id)?.value; if(v) settings[k]=v; });
+        .forEach(([id,k])=>{ const v=el(id)?.value?.trim(); if(v !== undefined && v !== '') settings[k]=v; });
+    if(!Object.keys(settings).length){ msg('coinMsg','⚠️ Koi value nahi bhari',false); return; }
     try {
         await DB.adminSaveSettings(settings);
         if(settings.price){ if(el('quickPrice')) el('quickPrice').value=settings.price; if(el('currentPriceDisplay')) el('currentPriceDisplay').textContent='$'+parseFloat(settings.price).toFixed(6); }
         msg('coinMsg','✅ Settings saved!'); showToast('✅ Settings saved!');
-    } catch(e) { msg('coinMsg','⚠️ Error',false); }
+    } catch(e) { msg('coinMsg','⚠️ Error: '+e.message,false); }
 }
 
 async function saveTokenomics() {
