@@ -282,9 +282,10 @@ async function initApp() {
     } catch(e) {}
 
     // Profile UI
-    if(el('profileName'))  el('profileName').textContent  = currentUser.name||'';
-    if(el('profileEmail')) el('profileEmail').textContent = currentUser.email||'';
-    if(el('profilePhone')) el('profilePhone').textContent = currentUser.phone||'';
+    if(el('profileName'))    el('profileName').textContent    = currentUser.name||'';
+    if(el('profileEmail'))   el('profileEmail').textContent   = currentUser.email||'';
+    if(el('profilePhone'))   el('profilePhone').textContent   = currentUser.phone||'';
+    if(el('profileUserId'))  el('profileUserId').textContent  = currentUser.user_id ? '🪪 '+currentUser.user_id : '';
     applyAvatar(currentUser.avatar_url||null);
 
     // Price history seed

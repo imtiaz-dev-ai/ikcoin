@@ -22,13 +22,14 @@ const DB = {
         if(snap.exists) throw new Error('Email already registered');
         const referral_code = 'IK' + Math.random().toString(36).substr(2,6).toUpperCase();
         const wallet_addr   = 'IK' + Math.random().toString(36).substr(2,12).toUpperCase();
+        const user_id       = 'IK' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase();
         let referred_by = null;
         // Check ref code
         if(ref_code) {
             const rSnap = await window.db.collection('users').where('referral_code','==',ref_code.toUpperCase()).limit(1).get();
             if(!rSnap.empty) referred_by = rSnap.docs[0].id;
         }
-        const user = { name, email, phone:phone||'', wallet_cc:0, wallet_addr, referral_code, ref_earned:0, referred_by, avatar_url:'', surprise_claimed:false, status:'active', created_at: firebase.firestore.FieldValue.serverTimestamp() };
+        const user = { name, email, phone:phone||'', wallet_cc:0, wallet_addr, referral_code, user_id, ref_earned:0, referred_by, avatar_url:'', surprise_claimed:false, status:'active', created_at: firebase.firestore.FieldValue.serverTimestamp() };
         await ref.set(user);
         // Referral bonuses
         if(referred_by) {
